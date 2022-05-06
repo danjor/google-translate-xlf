@@ -40,20 +40,32 @@ async function translate(input, from, to, minTime, maxConcurrent, skip) {
             const source = elem.elements.find(el => el.name === 'source');
 
             if (source) {
-                const target = cloneDeep(source);
-                target.name = 'target';
+                const originalTarget = elem.elements.find(el => el.name === 'target');
 
-                target.elements.forEach(el => {
-                    if (el.type === 'text' && !match(el.text)) {
-                        if (skip) {
-                            el.text = '[INFO] Add your translation here';
-                        } else {
-                            targetsQueue.push(el);
-                        }
+                // by adding the following, need to generate and export first, then run command on langurage file directly
+                // but does not work currently with fr directly
+                // remove state new
+
+                if (!originalTarget || originalTarget.attributes?.state === 'new' || originalTarget.attributes?.state === 'update') {
+                    const target = cloneDeep(source);
+                    target.name = 'target';
+
+                    if (originalTarget?.attributes?.state) {
+                        originalTarget.attributes.state = undefined;
                     }
-                });
 
-                elem.elements.push(target);
+                    target.elements.forEach(el => {
+                        if (el.type === 'text' && !match(el.text)) {
+                            if (skip) {
+                                el.text = '[INFO] Add your translation here';
+                            } else {
+                                targetsQueue.push(el);
+                            }
+                        }
+                    });
+
+                    elem.elements.push(target);
+                }
             }
 
             continue;
