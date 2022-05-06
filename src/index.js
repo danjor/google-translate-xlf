@@ -62,6 +62,14 @@ const argv = require('yargs')
         type: 'number',
         default: 4,
     })
+    .option('p', {
+        alias: 'proxy',
+        demand: false,
+        describe:
+            'Use proxy',
+        type: 'boolean',
+        default: 5,
+    })
     .option('s', {
         alias: 'skip',
         demand: false,
@@ -79,7 +87,7 @@ const startTime = Date.now();
 readFileAsync(path.resolve(argv.in))
     // translate the file
     .then(xlf => {
-        return translate(xlf.toString(), argv.from, argv.to, argv.rate, argv.concurrent, argv.skip);
+        return translate(xlf.toString(), argv.from, argv.to, argv.rate, argv.concurrent, argv.skip, argv.proxy);
     })
 
     // write the result to the output file

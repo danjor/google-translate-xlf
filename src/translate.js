@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const cloneDeep = require('lodash.clonedeep');
 const convert = require('xml-js');
 const Bottleneck = require('bottleneck/es5');
-
+const tunnel = require('tunnel');
 const log = require('./helpers/log');
 const match = require('./helpers/text-matcher');
 const date = require('./helpers/date');
@@ -17,7 +17,7 @@ const date = require('./helpers/date');
  *
  * @returns {string}
  */
-async function translate(input, from, to, minTime, maxConcurrent, skip) {
+async function translate(input, from, to, minTime, maxConcurrent, skip, proxy) {
     const xlfStruct = convert.xml2js(input);
     const limiter = new Bottleneck({
         maxConcurrent,
@@ -78,7 +78,7 @@ async function translate(input, from, to, minTime, maxConcurrent, skip) {
 
     const allPromises = skip
         ? []
-        : targetsQueue.map((el) => limiter.schedule(() => getTextTranslation(el, from, to, skip)));
+        : targetsQueue.map((el) => limiter.schedule(() => getTextTranslation(el, from, to, skip, proxy)));
 
     await Promise.all(allPromises);
 
@@ -91,9 +91,22 @@ async function translate(input, from, to, minTime, maxConcurrent, skip) {
     });
 }
 
-async function getTextTranslation(el, from, to) {
+async function getTextTranslation(el, from, to, skip, proxy) {
+    const proxyConfig = proxy ? {
+        agent: tunnel.httpsOverHttp({
+            proxy: {
+                host: '127.0.0.1',
+                port: '9000',
+                headers: {
+                    'User-Agent': 'Node'
+                }
+            }
+        })
+    } : {}
+
     try {
-        const result = await googleTranslate(el.text, { from, to });
+        const result = await googleTranslate(el.text, { from, to }, proxyConfig);
+
         log(
             'Translating ' +
             chalk.yellow(el.text) +
