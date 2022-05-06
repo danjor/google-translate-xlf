@@ -1,4 +1,4 @@
-const googleTranslate = require('@k3rn31p4nic/google-translate-api');
+const googleTranslate = require('@vitalets/google-translate-api');
 const chalk = require('chalk');
 const cloneDeep = require('lodash.clonedeep');
 const convert = require('xml-js');

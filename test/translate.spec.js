@@ -5,7 +5,7 @@ const date = require('../src/helpers/date');
 
 // import the file to test and mock out its dependencies
 const translate = proxyquire('../src/translate', {
-    '@k3rn31p4nic/google-translate-api': text => {
+    '@vitalets/google-translate-api': text => {
         // this function simulates the Google Translate API.
         // all words will be translated to [word]_TRANSLATED, i.e:
         // "hello world" => "hello_TRANSLATED world_TRANSLATED"
