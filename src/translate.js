@@ -97,6 +97,19 @@ async function translate(input, from, to, minTime, maxConcurrent, skip, proxy, c
     });
 }
 
+const getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return;
+        }
+        seen.add(value);
+      }
+      return value;
+    };
+  };
+
 async function getTextTranslation(el, from, to, skip, proxy) {
     const proxyConfig = proxy ? {
         agent: tunnel.httpsOverHttp({
@@ -121,7 +134,7 @@ async function getTextTranslation(el, from, to, skip, proxy) {
         );
         el.text = result.text;
     } catch (err) {
-        console.log(`[ERROR] ${JSON.stringify(err)}`);
+        console.log(`[ERROR] ${JSON.stringify(err, getCircularReplacer())}`);
         console.log('[TRACE]', err.stack);
         el.text = '[WARN] Failed to translate';
     }
