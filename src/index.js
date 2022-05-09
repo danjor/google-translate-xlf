@@ -12,14 +12,14 @@ const log = require('./helpers/log');
 // setup up the command line interface
 const argv = require('yargs')
     .usage(
-        'xlf2xlf [options] \nTranslates all property values in an .xlf file from one language to another.'
+        'xlf-auto-translate [options] \nTranslates all property values in an .xlf file from one language to another.'
     )
     .example(
-        'xlf2xlf --in messages.xlf --out messages.hi.xlf --from en --to nl',
+        'xlf-auto-translate --in messages.xlf --out messages.hi.xlf --from en --to nl',
         'Translate an .xlf file from English to Dutch'
     )
     .example(
-        'xlf2xlf -i messages.xlf -o messages.fr.xlf -f en -t fr',
+        'xlf-auto-translate -i messages.xlf -o messages.fr.xlf -f en -t fr',
         'Translate an .xlf file from English to French'
     )
     .option('i', {

@@ -1,5 +1,5 @@
 {
-  "name": "google-translate-api",
+  "name": "xlf-auto-translate",
   "version": "1.0.19",
   "description": "A command-line utility to automatically translate .xlf translation files using Google Translate",
   "main": "./src/index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chekit/xlf2xlf.git"
+    "url": "git+https://github.com/danjor/google-translate-xlf.git"
   },
   "keywords": [
     "translate",
@@ -24,13 +24,19 @@
   ],
   "author": "Anton Cherepov",
   "license": "MIT",
+  "contributors" : [
+    {
+      "name" : "danjor",
+      "email" : "danjor-github@hotmail.com"
+    }
+  ],
   "bugs": {
-    "url": "https://github.com/chekit/xlf2xlf/issues"
+    "url": "https://github.com/danjor/google-translate-xlf/issues"
   },
-  "homepage": "https://github.com/chekit/xlf2xlf#readme",
+  "homepage": "https://github.com/danjor/google-translate-xlf#readme",
   "preferGlobal": true,
   "bin": {
-    "xlf2xlf": "./src/index.js"
+    "xlf-auto-translate": "./src/index.js"
   },
   "dependencies": {
     "@vitalets/google-translate-api": "8.0.0",
