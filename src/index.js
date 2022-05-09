@@ -77,7 +77,16 @@ const argv = require('yargs')
             'Skips translating and adds only target tag with boilerplate text inside',
         type: 'boolean',
         default: false,
-    }).argv;
+    })
+    .option('cs', {
+        alias: 'clearState',
+        demand: false,
+        describe:
+            'Clear state once translated',
+        type: 'boolean',
+        default: false,
+    })
+    .argv;
 
 // start a timer so that we can
 // report how long the whole process took
@@ -87,7 +96,7 @@ const startTime = Date.now();
 readFileAsync(path.resolve(argv.in))
     // translate the file
     .then(xlf => {
-        return translate(xlf.toString(), argv.from, argv.to, argv.rate, argv.concurrent, argv.skip, argv.proxy);
+        return translate(xlf.toString(), argv.from, argv.to, argv.rate, argv.concurrent, argv.skip, argv.proxy, argv.clearState);
     })
 
     // write the result to the output file

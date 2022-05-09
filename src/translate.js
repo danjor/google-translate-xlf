@@ -17,7 +17,7 @@ const date = require('./helpers/date');
  *
  * @returns {string}
  */
-async function translate(input, from, to, minTime, maxConcurrent, skip, proxy) {
+async function translate(input, from, to, minTime, maxConcurrent, skip, proxy, clearState) {
     const xlfStruct = convert.xml2js(input);
     const limiter = new Bottleneck({
         maxConcurrent,
@@ -46,19 +46,24 @@ async function translate(input, from, to, minTime, maxConcurrent, skip, proxy) {
                 // but does not work currently with fr directly
                 // remove state new
 
-                if (!target || originalTarget.attributes?.state === 'new' || originalTarget.attributes?.state === 'update') {
+                if (!target || target.attributes?.state === 'new' || target.attributes?.state === 'update') {
 
                     if (!target) {
                         target = cloneDeep(source);
                         elem.elements.push(target);
                     }
 
-                    if (originalTarget?.attributes?.state) {
-                        originalTarget.attributes.state = undefined;
+                    const hasPlural = target.elements.some(el => el.text?.indexOf('{VAR_PLURAL') >= 0)
+                    if (hasPlural) {
+                        continue;
                     }
 
                     target.elements.forEach(el => {
                         if (el.type === 'text' && !match(el.text)) {
+                            if (clearState && target?.attributes?.state) {
+                                target.attributes.state = undefined;
+                            }
+
                             if (skip) {
                                 el.text = '[INFO] Add your translation here';
                             } else {
