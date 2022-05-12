@@ -1,6 +1,6 @@
 {
   "name": "xlf-auto-translate",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "A command-line utility to automatically translate .xlf translation files using Google Translate",
   "main": "./src/index.js",
   "scripts": {
@@ -24,10 +24,10 @@
   ],
   "author": "Anton Cherepov",
   "license": "MIT",
-  "contributors" : [
+  "contributors": [
     {
-      "name" : "danjor",
-      "email" : "danjor-github@hotmail.com"
+      "name": "danjor",
+      "email": "danjor-github@hotmail.com"
     }
   ],
   "bugs": {
@@ -43,9 +43,9 @@
     "bottleneck": "2.19.5",
     "chalk": "2.4.1",
     "lodash.clonedeep": "4.5.0",
+    "tunnel": "0.0.6",
     "xml-js": "1.6.11",
-    "yargs": "15.3.1",
-    "tunnel": "0.0.6"
+    "yargs": "15.3.1"
   },
   "devDependencies": {
     "chai": "4.1.2",
