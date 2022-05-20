@@ -17,54 +17,100 @@ const date = require('./helpers/date');
  *
  * @returns {string}
  */
-async function translate(input, from, to, minTime, maxConcurrent, skip, proxy, clearState) {
+async function translate(
+    input,
+    from,
+    to,
+    minTime,
+    maxConcurrent,
+    skip,
+    proxy,
+    clearState
+) {
+    const schema = {
+        input,
+        from,
+        to,
+        minTime,
+        maxConcurrent,
+        skip,
+        proxy,
+        clearState,
+    };
     const xlfStruct = convert.xml2js(input);
     const limiter = new Bottleneck({
         maxConcurrent,
-        minTime
+        minTime,
     });
 
     const elementsQueue = [];
     const targetsQueue = [];
 
+    const isXlfV2 = xlfStruct.elements[0].attributes.version === '2.0';
+
     elementsQueue.push(xlfStruct);
+
+    if (isXlfV2) {
+        processXlfV2(elementsQueue, targetsQueue, schema);
+    } else {
+        processXlfV1(elementsQueue, targetsQueue, schema);
+    }
+
+    const allPromises = skip
+        ? []
+        : targetsQueue.map((el) =>
+              limiter.schedule(() =>
+                  getTextTranslation(el, from, to, skip, proxy)
+              )
+          );
+
+    await Promise.all(allPromises);
+
+    return convert.js2xml(xlfStruct, {
+        spaces: 4,
+        // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
+        attributeValueFn: function (value) {
+            return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        },
+    });
+}
+
+const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
+   
+
     while (elementsQueue.length) {
         const elem = elementsQueue.shift();
-
         if (elem.name === 'file') {
-            elem.attributes['target-language'] = to;
+            elem.attributes['target-language'] = schema.to;
             elem.attributes['date'] = date();
         }
 
         if (elem.name === 'trans-unit') {
-            const source = elem.elements.find(el => el.name === 'source');
+            const source = elem.elements.find((el) => el.name === 'source');
 
             if (source) {
-                let target = elem.elements.find(el => el.name === 'target');
+                let target = elem.elements.find((el) => el.name === 'target');
 
-                // by adding the following, need to generate and export first, then run command on langurage file directly
-                // but does not work currently with fr directly
-                // remove state new
-
-                if (!target || target.attributes?.state === 'new' || target.attributes?.state === 'update') {
-
+                if (!target || target.attributes?.state === 'new') {
                     if (!target) {
                         target = cloneDeep(source);
                         elem.elements.push(target);
                     }
 
-                    const hasPlural = target.elements.some(el => el.text?.indexOf('{VAR_PLURAL') >= 0)
+                    const hasPlural = target.elements.some(
+                        (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
+                    );
                     if (hasPlural) {
                         continue;
                     }
 
-                    target.elements.forEach(el => {
+                    target.elements.forEach((el) => {
                         if (el.type === 'text' && !match(el.text)) {
-                            if (clearState && target?.attributes?.state) {
+                            if (schema.clearState && target?.attributes?.state) {
                                 target.attributes.state = undefined;
                             }
 
-                            if (skip) {
+                            if (schema.skip) {
                                 el.text = '[INFO] Add your translation here';
                             } else {
                                 targetsQueue.push(el);
@@ -78,59 +124,102 @@ async function translate(input, from, to, minTime, maxConcurrent, skip, proxy, c
         }
 
         if (elem && elem.elements && elem.elements.length) {
-            elementsQueue.push(...elem.elements)
-        };
-    }
-
-    const allPromises = skip
-        ? []
-        : targetsQueue.map((el) => limiter.schedule(() => getTextTranslation(el, from, to, skip, proxy)));
-
-    await Promise.all(allPromises);
-
-    return convert.js2xml(xlfStruct, {
-        spaces: 4,
-        // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
-        attributeValueFn: function (value) {
-            return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            elementsQueue.push(...elem.elements);
         }
-    });
-}
+    }
+};
+
+const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
+    while (elementsQueue.length) {
+        const elem = elementsQueue.shift();
+
+        if (elem.name === 'xliff') {
+            elem.attributes['trgLang'] = schema.to;
+            elem.attributes['date'] = date();
+        }
+
+        if (elem.name === 'unit') {
+            const segment = elem.elements.find((el) => el.name === 'segment');
+            const source = segment.elements.find((el) => el.name === 'source');
+            const target = segment.elements.find((el) => el.name === 'target');
+
+            if (!target || segment.attributes?.state === 'initial') {
+                if (!target) {
+                    target = cloneDeep(source);
+                    elem.elements.push(target);
+                }
+
+                const hasPlural = target.elements.some(
+                    (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
+                );
+                if (hasPlural) {
+                    continue;
+                }
+
+                target.elements.forEach((el) => {
+                    if (el.type === 'text' && !match(el.text)) {
+                        if (schema.clearState && segment?.attributes?.state) {
+                            segment.attributes.state = undefined;
+                        }
+
+                        if (schema.skip) {
+                            el.text = '[INFO] Add your translation here';
+                        } else {
+                            targetsQueue.push(el);
+                        }
+                    }
+                });
+            }
+
+            continue;
+        }
+
+        if (elem && elem.elements && elem.elements.length) {
+            elementsQueue.push(...elem.elements);
+        }
+    }
+};
 
 const getCircularReplacer = () => {
     const seen = new WeakSet();
     return (key, value) => {
-      if (typeof value === 'object' && value !== null) {
-        if (seen.has(value)) {
-          return;
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return;
+            }
+            seen.add(value);
         }
-        seen.add(value);
-      }
-      return value;
+        return value;
     };
-  };
+};
 
 async function getTextTranslation(el, from, to, skip, proxy) {
-    const proxyConfig = proxy ? {
-        agent: tunnel.httpsOverHttp({
-            proxy: {
-                host: '127.0.0.1',
-                port: '9000',
-                headers: {
-                    'User-Agent': 'Node'
-                }
-            }
-        })
-    } : {}
+    const proxyConfig = proxy
+        ? {
+              agent: tunnel.httpsOverHttp({
+                  proxy: {
+                      host: '127.0.0.1',
+                      port: '9000',
+                      headers: {
+                          'User-Agent': 'Node',
+                      },
+                  },
+              }),
+          }
+        : {};
 
     try {
-        const result = await googleTranslate(el.text, { from, to }, proxyConfig);
+        const result = await googleTranslate(
+            el.text,
+            { from, to },
+            proxyConfig
+        );
 
         log(
             'Translating ' +
-            chalk.yellow(el.text) +
-            ' to ' +
-            chalk.green(result.text)
+                chalk.yellow(el.text) +
+                ' to ' +
+                chalk.green(result.text)
         );
         el.text = result.text;
     } catch (err) {
