@@ -107,7 +107,7 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
                     target.elements.forEach((el) => {
                         if (el.type === 'text' && !match(el.text)) {
                             if (schema.clearState && target?.attributes?.state) {
-                                target.attributes.state = undefined;
+                                target.attributes.state = 'translated';
                             }
 
                             if (schema.skip) {
@@ -159,7 +159,7 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
                 target.elements.forEach((el) => {
                     if (el.type === 'text' && !match(el.text)) {
                         if (schema.clearState && segment?.attributes?.state) {
-                            segment.attributes.state = undefined;
+                            segment.attributes.state = 'translated';
                         }
 
                         if (schema.skip) {

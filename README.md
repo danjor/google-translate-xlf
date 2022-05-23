@@ -1,5 +1,4 @@
 # xlf-auto-translate (ex. xlf2xlf)
-![xlf-auto-translate](./logo.png)
 
 A command-line utility to automatically translate .xlf translation files v1.2 or v2 using Google Translate
 
