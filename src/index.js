@@ -65,8 +65,7 @@ const argv = require('yargs')
     .option('p', {
         alias: 'proxy',
         demand: false,
-        describe:
-            'Use proxy',
+        describe: 'Use proxy',
         type: 'boolean',
         default: 5,
     })
@@ -81,12 +80,10 @@ const argv = require('yargs')
     .option('cs', {
         alias: 'clearState',
         demand: false,
-        describe:
-            'Clear state once translated',
+        describe: 'Clear state once translated',
         type: 'boolean',
         default: false,
-    })
-    .argv;
+    }).argv;
 
 // start a timer so that we can
 // report how long the whole process took
@@ -95,36 +92,48 @@ const startTime = Date.now();
 // get the input .xlf file from the filesystem
 readFileAsync(path.resolve(argv.in))
     // translate the file
-    .then(xlf => {
-        return translate(xlf.toString(), argv.from, argv.to, argv.rate, argv.concurrent, argv.skip, argv.proxy, argv.clearState);
+    .then((xlf) => {
+        return translate(
+            xlf.toString(),
+            argv.from,
+            argv.to,
+            argv.rate,
+            argv.concurrent,
+            argv.skip,
+            argv.proxy,
+            argv.clearState
+        );
     })
 
     // write the result to the output file
-    .then(output => {
-        return writeFileAsync(path.resolve(argv.out), output);
+    .then((resp) => {
+        this.numberOfTranslated = resp.numberOfTranslated;
+        return writeFileAsync(path.resolve(argv.out), resp.xml);
     })
 
     // write a cheery message to the console
     .then(() => {
+        console.log('this.numberOfTranslated', this.numberOfTranslated);
         const endTime = Date.now();
         log(
             chalk.green('✓') +
-            ' Finished translating ' +
-            argv.in +
-            ' in ' +
-            (endTime - startTime) +
-            'ms.'
+                ' Finished translating ' +
+                this.numberOfTranslated +
+                ' messages for ' +
+                argv.in +
+                ' in ' +
+                (endTime - startTime) +
+                'ms.'
         );
     })
 
     // or, if something went wrong,  a grumpy one
-    .catch(err => {
+    .catch((err) => {
         log(
             chalk.red('X') +
-            ' Something went wrong while translating ' +
-            argv.in +
-            '!'
+                ' Something went wrong while translating ' +
+                argv.in +
+                '!'
         );
         log('' + err.stack);
     });
-

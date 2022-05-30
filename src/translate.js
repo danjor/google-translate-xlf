@@ -66,18 +66,19 @@ async function translate(
 
     await Promise.all(allPromises);
 
-    return convert.js2xml(xlfStruct, {
-        spaces: 4,
-        // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
-        attributeValueFn: function (value) {
-            return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        },
-    });
+    return {
+        xml: convert.js2xml(xlfStruct, {
+            spaces: 4,
+            // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
+            attributeValueFn: function (value) {
+                return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            },
+        }),
+        numberOfTranslated: targetsQueue.length
+    };
 }
 
 const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
-   
-
     while (elementsQueue.length) {
         const elem = elementsQueue.shift();
         if (elem.name === 'file') {
@@ -106,7 +107,10 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
 
                     target.elements.forEach((el) => {
                         if (el.type === 'text' && !match(el.text)) {
-                            if (schema.clearState && target?.attributes?.state) {
+                            if (
+                                schema.clearState &&
+                                target?.attributes?.state
+                            ) {
                                 target.attributes.state = 'translated';
                             }
 
