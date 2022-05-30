@@ -25,6 +25,7 @@ async function translate(
     maxConcurrent,
     skip,
     proxy,
+    autoProxy,
     clearState
 ) {
     const schema = {
@@ -35,6 +36,7 @@ async function translate(
         maxConcurrent,
         skip,
         proxy,
+        autoProxy,
         clearState,
     };
     const xlfStruct = convert.xml2js(input);
@@ -60,7 +62,7 @@ async function translate(
         ? []
         : targetsQueue.map((el) =>
               limiter.schedule(() =>
-                  getTextTranslation(el, from, to, skip, proxy)
+                  getTextTranslation(el, from, to, skip, proxy, autoProxy)
               )
           );
 
@@ -74,7 +76,7 @@ async function translate(
                 return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
             },
         }),
-        numberOfTranslated: targetsQueue.length
+        numberOfTranslated: targetsQueue.length,
     };
 }
 
@@ -197,20 +199,37 @@ const getCircularReplacer = () => {
     };
 };
 
-async function getTextTranslation(el, from, to, skip, proxy) {
-    const proxyConfig = proxy
-        ? {
-              agent: tunnel.httpsOverHttp({
-                  proxy: {
-                      host: '127.0.0.1',
-                      port: '9000',
-                      headers: {
-                          'User-Agent': 'Node',
-                      },
-                  },
-              }),
-          }
-        : {};
+async function getTextTranslation(el, from, to, skip, proxy, autoProxy) {
+    let proxyConfig = {};
+
+    if (proxy) {
+        const [protocol, rest] = proxy.split('://');
+        const [host, port] = rest.split(':');
+        proxyConfig = {
+            agent: tunnel.httpsOverHttp({
+                proxy: {
+                    host,
+                    port,
+                    headers: {
+                        'User-Agent': 'Node',
+                    },
+                },
+            }),
+        };
+    }
+    if (autoProxy) {
+        proxyConfig = {
+            agent: tunnel.httpsOverHttp({
+                proxy: {
+                    host: '127.0.0.1',
+                    port: '9000',
+                    headers: {
+                        'User-Agent': 'Node',
+                    },
+                },
+            }),
+        };
+    }
 
     try {
         const result = await googleTranslate(

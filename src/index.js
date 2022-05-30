@@ -66,8 +66,14 @@ const argv = require('yargs')
         alias: 'proxy',
         demand: false,
         describe: 'Use proxy',
+        type: 'string',
+    })
+    .option('ap', {
+        alias: 'autoProxy',
+        demand: false,
+        describe: 'Use auto proxy',
         type: 'boolean',
-        default: 5,
+        default: false,
     })
     .option('s', {
         alias: 'skip',
@@ -101,6 +107,7 @@ readFileAsync(path.resolve(argv.in))
             argv.concurrent,
             argv.skip,
             argv.proxy,
+            argv.autoProxy,
             argv.clearState
         );
     })

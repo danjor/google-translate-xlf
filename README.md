@@ -87,9 +87,9 @@ Message:
 | r / rate        | 500       | false       | How long to wait after launching a job before launching another one in ms. For more information see [https://github.com/SGrondin/bottleneck#docs](https://github.com/SGrondin/bottleneck)  |
 | c / concurrent  | 4         | false       | How many jobs can be executing at the same time. For more information see [https://github.com/SGrondin/bottleneck#docs](https://github.com/SGrondin/bottleneck)   |
 | s / skip        | false     | false       | Skips translating and adds only target tag with boilerplate text `[INFO] Add your translation here`  |
-| s / skip        | false     | false       | Skips translating and adds only target tag with boilerplate text `[INFO] Add your translation here`  |
-| p / proxy       | false     | false       | Use default proxy   |
-| p / clearState  | false     | false       | Clear state once translated   |
+| p / proxy       | false     | false       | Use custom proxy  |
+| ap / autoProxy  | -         | false       | Use default proxy   |
+| cs / clearState | false     | false       | Clear state once translated   |
 
 
 ## 🤒 Known issues
