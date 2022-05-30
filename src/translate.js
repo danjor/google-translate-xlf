@@ -99,17 +99,17 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
                         target = cloneDeep(source);
                         elem.elements.push(target);
                     }
-                    const newTarget = cloneDeep(source);
-                    target.attributes = newTarget.attributes
-                    target.elements = newTarget.elements
-                    target.name = 'target'
-
-                    const hasPlural = target.elements.some(
+                    
+                    const hasPlural = source.elements.some(
                         (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
                     );
                     if (hasPlural) {
                         continue;
                     }
+
+                    const newTarget = cloneDeep(source);
+                    target.elements = newTarget.elements
+                    target.name = 'target'
 
                     target.elements.forEach((el) => {
                         if (el.type === 'text' && !match(el.text)) {
@@ -159,10 +159,9 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
                     elem.elements.push(target);
                 }
 
-                const newTarget = cloneDeep(source);
-                target.attributes = newTarget.attributes
-                target.elements = newTarget.elements
-                target.name = 'target'
+                 const newTarget = cloneDeep(source);
+                    target.elements = newTarget.elements
+                    target.name = 'target'
 
                 const hasPlural = target.elements.some(
                     (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
