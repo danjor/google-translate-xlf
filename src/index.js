@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 /*
     For usage help, run "node index.js help"
 */
