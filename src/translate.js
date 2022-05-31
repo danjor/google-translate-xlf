@@ -70,7 +70,7 @@ async function translate(
 
     return {
         xml: convert.js2xml(xlfStruct, {
-            spaces: 4,
+            spaces: 2,
             // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
             attributeValueFn: function (value) {
                 return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
