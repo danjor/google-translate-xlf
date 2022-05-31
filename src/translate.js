@@ -7,6 +7,7 @@ const tunnel = require('tunnel');
 const log = require('./helpers/log');
 const match = require('./helpers/text-matcher');
 const date = require('./helpers/date');
+const {xmlNormalize} = require('xml_normalize/dist/src/xmlNormalize');
 
 /**
  * Translates an .xlf file from one language to another
@@ -68,14 +69,26 @@ async function translate(
 
     await Promise.all(allPromises);
 
+    const xml = convert.js2xml(xlfStruct, {
+        spaces: 2,
+        // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
+        attributeValueFn: function (value) {
+            return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        },
+    });
+
+    let normalizedTarget = xmlNormalize({
+        in: xml,
+        trim: true,
+        normalizeWhitespace: true,
+        // no sorting for 'stableAppendNew' as this is the default merge behaviour:
+        sortPath: undefined,
+        removePath: undefined,
+    });
+
+
     return {
-        xml: convert.js2xml(xlfStruct, {
-            spaces: 2,
-            // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
-            attributeValueFn: function (value) {
-                return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            },
-        }),
+        xml: normalizedTarget,
         numberOfTranslated: targetsQueue.length,
     };
 }

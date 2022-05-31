@@ -8,7 +8,6 @@ const chalk = require('chalk');
 const { readFileAsync, writeFileAsync } = require('./helpers/fs-async');
 const translate = require('./translate');
 const log = require('./helpers/log');
-const {xmlNormalize} = require('xml_normalize/dist/src/xmlNormalize');
 
 
 // setup up the command line interface
@@ -117,15 +116,7 @@ readFileAsync(path.resolve(argv.in))
     // write the result to the output file
     .then((resp) => {
         this.numberOfTranslated = resp.numberOfTranslated;
-        const normalizedTarget = xmlNormalize({
-            in: resp.xml,
-            trim: true,
-            normalizeWhitespace: true,
-            // no sorting for 'stableAppendNew' as this is the default merge behaviour:
-            sortPath: undefined,
-            removePath: undefined
-        });
-        return writeFileAsync(path.resolve(argv.out), normalizedTarget);
+        return writeFileAsync(path.resolve(argv.out), resp.xml);
     })
 
     // write a cheery message to the console
