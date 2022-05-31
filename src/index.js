@@ -119,7 +119,7 @@ readFileAsync(path.resolve(argv.in))
         this.numberOfTranslated = resp.numberOfTranslated;
         const normalizedTarget = xmlNormalize({
             in: resp.xml,
-            trim: false,
+            trim: true,
             normalizeWhitespace: true,
             // no sorting for 'stableAppendNew' as this is the default merge behaviour:
             sortPath: undefined,
