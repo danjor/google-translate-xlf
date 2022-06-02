@@ -7,7 +7,7 @@ const tunnel = require('tunnel');
 const log = require('./helpers/log');
 const match = require('./helpers/text-matcher');
 const date = require('./helpers/date');
-const {xmlNormalize} = require('xml_normalize/dist/src/xmlNormalize');
+const { xmlNormalize } = require('xml_normalize/dist/src/xmlNormalize');
 
 /**
  * Translates an .xlf file from one language to another
@@ -86,7 +86,6 @@ async function translate(
         removePath: undefined,
     });
 
-
     return {
         xml: normalizedTarget,
         numberOfTranslated: targetsQueue.length,
@@ -117,6 +116,9 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
                         (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
                     );
                     if (hasPlural) {
+                        if (schema.clearState && target?.attributes?.state) {
+                            target.attributes.state = 'needs-translation';
+                        }
                         continue;
                     }
 
@@ -180,6 +182,9 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
                     (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
                 );
                 if (hasPlural) {
+                    if (schema.clearState && segment?.attributes?.state) {
+                        segment.attributes.state = 'needs-translation';
+                    }
                     continue;
                 }
 
