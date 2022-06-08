@@ -115,7 +115,8 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
                     const hasPlural = source.elements.some(
                         (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
                     );
-                    if (hasPlural) {
+                    const hasText = target.elements.some((el) => el.type === 'text')
+                    if (hasPlural || !hasText) {
                         if (schema.clearState && target?.attributes?.state) {
                             target.attributes.state = 'needs-translation';
                         }
@@ -181,7 +182,8 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
                 const hasPlural = target.elements.some(
                     (el) => el.text?.indexOf('{VAR_PLURAL') >= 0
                 );
-                if (hasPlural) {
+                const hasText = target.elements.some((el) => el.type === 'text')
+                if (hasPlural || !hasText) {
                     if (schema.clearState && segment?.attributes?.state) {
                         segment.attributes.state = 'needs-translation';
                     }
