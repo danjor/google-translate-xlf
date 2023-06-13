@@ -167,7 +167,7 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
         if (elem.name === 'unit') {
             const segment = elem.elements.find((el) => el.name === 'segment');
             const source = segment.elements.find((el) => el.name === 'source');
-            const target = segment.elements.find((el) => el.name === 'target');
+            let target = segment.elements.find((el) => el.name === 'target');
 
             if (!target || segment.attributes?.state === 'initial') {
                 if (!target) {
