@@ -90,6 +90,13 @@ const argv = require('yargs')
         describe: 'Clear state once translated',
         type: 'boolean',
         default: false,
+    })
+    .option('addApproved', {
+        alias: 'addApprovedToStateFinal',
+        demand: false,
+        describe: 'Add approved="true" XML attribute to trans-unit with translation with state="final"',
+        type: 'boolean',
+        default: false,
     }).argv;
 
 // start a timer so that we can
@@ -109,7 +116,8 @@ readFileAsync(path.resolve(argv.in))
             argv.skip,
             argv.proxy,
             argv.autoProxy,
-            argv.clearState
+            argv.clearState,
+            argv.addApprovedToStateFinal
         );
     })
 

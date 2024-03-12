@@ -1,6 +1,6 @@
 {
   "name": "xlf-auto-translate",
-  "version": "1.0.33",
+  "version": "1.0.34",
   "description": "A command-line utility to automatically translate .xlf translation files using Google Translate",
   "main": "./src/index.js",
   "scripts": {
