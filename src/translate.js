@@ -27,7 +27,8 @@ async function translate(
     skip,
     proxy,
     autoProxy,
-    clearState
+    clearState,
+    addApprovedToStateFinal
 ) {
     const schema = {
         input,
@@ -39,6 +40,7 @@ async function translate(
         proxy,
         autoProxy,
         clearState,
+        addApprovedToStateFinal,
     };
     const xlfStruct = convert.xml2js(input);
     const limiter = new Bottleneck({
@@ -79,7 +81,7 @@ async function translate(
 
     let normalizedTarget = xmlNormalize({
         in: xml,
-        trim: true,
+        trim: false,
         normalizeWhitespace: true,
         // no sorting for 'stableAppendNew' as this is the default merge behaviour:
         sortPath: undefined,
@@ -106,7 +108,10 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
             if (source) {
                 let target = elem.elements.find((el) => el.name === 'target');
 
-                if (!target || target.attributes?.state === 'new') {
+                if (schema.addApprovedToStateFinal && target && target.attributes?.state === 'final') {
+                    elem.attributes.approved = 'yes';
+                }
+                else if (!target || target.attributes?.state === 'new') {
                     if (!target) {
                         target = cloneDeep(source);
                         elem.elements.push(target);
