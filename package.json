@@ -43,6 +43,7 @@
     "bottleneck": "2.19.5",
     "chalk": "2.4.1",
     "lodash.clonedeep": "4.5.0",
+    "npm-check-updates": "19.2.0",
     "tunnel": "0.0.6",
     "xml-js": "1.6.11",
     "xml_normalize":"0.8.4",
@@ -54,7 +55,7 @@
     "proxyquire": "2.0.1"
   },
   "volta": {
-    "node": "16.14.2",
-    "yarn": "1.22.17"
+    "node": "20.19.4",
+    "yarn": "1.22.22"
   }
 }
