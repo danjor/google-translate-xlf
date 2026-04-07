@@ -72,7 +72,7 @@ describe('translate', () => {
 
         return translate(input, 'en', TEST_LN, 500, 1, false)
             .then(output => [
-                convert.xml2js(output),
+                convert.xml2js(output.xml),
                 convert.xml2js(expectedOutput)
             ])
             .then(([output, expectedOutput]) => {

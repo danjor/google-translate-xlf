@@ -63,10 +63,20 @@ async function translate(
 
     const allPromises = skip
         ? []
-        : targetsQueue.map((el) =>
-              limiter.schedule(() =>
-                  getTextTranslation(el, from, to, skip, proxy, autoProxy)
-              )
+        : targetsQueue.map((item) =>
+              limiter.schedule(() => {
+                  if (minTime > 0) {
+                      // Each scheduled translation job now adds a random jitter of 0% to 50% of the base `minTime` value.
+                      // This ensures that while the minimum required interval is always respected, the actual timing of requests is randomized to avoid predictable patterns.
+                      const jitter = Math.floor(Math.random() * minTime * 0.5);
+                      limiter.updateSettings({ minTime: minTime + jitter });
+                  }
+                  return getTextTranslation(item, from, to, skip, proxy, autoProxy);
+              }).catch((err) => {
+                  if (err.statusCode === 429) {
+                      limiter.stop({ dropWaitingJobs: true });
+                  }
+              })
           );
 
     await Promise.all(allPromises);
@@ -134,17 +144,14 @@ const processXlfV1 = (elementsQueue, targetsQueue, schema) => {
 
                     target.elements.forEach((el) => {
                         if (el.type === 'text' && !match(el.text)) {
-                            if (
-                                schema.clearState &&
-                                target?.attributes?.state
-                            ) {
-                                target.attributes.state = 'translated';
-                            }
-
                             if (schema.skip) {
                                 el.text = '[INFO] Add your translation here';
                             } else {
-                                targetsQueue.push(el);
+                                targetsQueue.push({
+                                    el,
+                                    target,
+                                    clearState: schema.clearState,
+                                });
                             }
                         }
                     });
@@ -197,14 +204,14 @@ const processXlfV2 = (elementsQueue, targetsQueue, schema) => {
 
                 target.elements.forEach((el) => {
                     if (el.type === 'text' && !match(el.text)) {
-                        if (schema.clearState && segment?.attributes?.state) {
-                            segment.attributes.state = 'translated';
-                        }
-
                         if (schema.skip) {
                             el.text = '[INFO] Add your translation here';
                         } else {
-                            targetsQueue.push(el);
+                            targetsQueue.push({
+                                el,
+                                target: segment,
+                                clearState: schema.clearState,
+                            });
                         }
                     }
                 });
@@ -232,7 +239,8 @@ const getCircularReplacer = () => {
     };
 };
 
-async function getTextTranslation(el, from, to, skip, proxy, autoProxy) {
+async function getTextTranslation(item, from, to, skip, proxy, autoProxy) {
+    const { el, target, clearState } = item;
     let proxyConfig = {};
 
     if (proxy) {
@@ -289,10 +297,16 @@ async function getTextTranslation(el, from, to, skip, proxy, autoProxy) {
                 chalk.green(result.text)
         );
         el.text = result.text;
+        if (clearState && target?.attributes?.state) {
+            target.attributes.state = 'translated';
+        }
     } catch (err) {
         console.log(`[ERROR] ${JSON.stringify(err, getCircularReplacer())}`);
         console.log('[TRACE]', err.stack);
-        el.text = '[WARN] Failed to translate';
+
+        if (err.statusCode === 429) {
+            throw err;
+        }
     }
 }
 

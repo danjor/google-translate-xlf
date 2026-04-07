@@ -51,9 +51,9 @@ const argv = require('yargs')
         alias: 'rate',
         demand: false,
         describe:
-            'How long to wait after launching a job before launching another one in ms. For more information see https://github.com/SGrondin/bottleneck#docs',
+            'Minimum wait time (ms) between launching translation jobs. A randomized extra 0-50% will be added to this value to prevent rate limiting. For more info: https://github.com/SGrondin/bottleneck#docs',
         type: 'number',
-        default: 500,
+        default: 1000,
     })
     .option('c', {
         alias: 'concurrent',
@@ -61,7 +61,7 @@ const argv = require('yargs')
         describe:
             'How many jobs can be executing at the same time. For more information see https://github.com/SGrondin/bottleneck#docs',
         type: 'number',
-        default: 4,
+        default: 3,
     })
     .option('p', {
         alias: 'proxy',
