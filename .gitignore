@@ -63,6 +63,9 @@ typings/
 # ignore this file that I sometime use while debugging
 temp.json
 
+# ignore this file that I sometime use while debugging
+.idea
+
 examples-output
 locale/
 /messages*
