@@ -1,12 +1,12 @@
-# xlf-auto-translate (ex. xlf2xlf)
+# xlf-translate-auto (ex. xlf2xlf)
 
 A command-line utility to automatically translate .xlf translation files v1.2 or v2 using Google Translate
 
 **DISCLAIMER**
 
-> This library was forked from https://github.com/nfriend/xlf-auto-translate
+> This library was forked from https://github.com/nfriend/xlf-translate-auto
 
-> Some additions to package dependecies were made according to https://www.npmjs.com/package/xlf-auto-translate-updated
+> Some additions to package dependecies were made according to https://www.npmjs.com/package/xlf-translate-auto-updated
 
 The main goal to fork and edit original tool was to preserve word and interpolation blocks order while translating original _.xlf_ file, as base library copied this interpolation blocks to the end of _target_ element.
 
@@ -19,17 +19,17 @@ Also most of redundant dependecies were removed, file and folder structure were 
 This is a command-line utility.  To install this utility, run:
 
 ```bash
-npm install -g xlf-auto-translate
+npm install -g xlf-translate-auto
 ```
 
-This will install the utility globally so that it can be run from any location. The executable installed by this module is `xlf-auto-translate`.
+This will install the utility globally so that it can be run from any location. The executable installed by this module is `xlf-translate-auto`.
 ___
 
 You also could run library using **npx** utility.
 
 
 ```bash
-npx xlf-auto-translate [options]
+npx xlf-translate-auto [options]
 ```
 
 ## Usage
@@ -41,22 +41,22 @@ If you are using [Angular 2+](https://angular.io/) and the [Angular CLI](https:/
 Say we have an `.xlf` file named `messages.xlf`.  Let's translate this file from English ("en") to Hindi ("hi") and save the translated file as `messages.hi.xlf`:
 
 ```bash
-xlf-auto-translate --in messages.xlf --out messages.hi.xlf --from en --to hi
+xlf-translate-auto --in messages.xlf --out messages.hi.xlf --from en --to hi
 ```
 
 Or, if you don't like typing too much, you can use the abbreviated versions of the arguments:
 
 ```bash
-xlf-auto-translate -i messages.xlf -o messages.hi.xlf -f en -t nl
+xlf-translate-auto -i messages.xlf -o messages.hi.xlf -f en -t nl
 ```
 
 For more usage help, run:
 
 ```bash
-xlf-auto-translate help
+xlf-translate-auto help
 ```
 
-> If the utility not installed globally, just use it via npx, e.g. `npx xlf-auto-translate --in messages.xlf --out messages.hi.xlf --from en --to hi`
+> If the utility not installed globally, just use it via npx, e.g. `npx xlf-translate-auto --in messages.xlf --out messages.hi.xlf --from en --to hi`
 
 ## Messages
 
@@ -101,8 +101,8 @@ Message:
 In case you are starting to get `{"name":"HTTPError","statusCode":429,"statusMessage":"Too Many Requests"}` you could do the following:
 
 - Wait a bit before Google Translate will stop blocking your IP
-- Try to set bigger rate `npx xlf-auto-translate --in messages.xlf --out messages.hi.xlf --from en --to hi --rate 5000`, where rate is ms between queries. For more information on that property see [https://github.com/SGrondin/bottleneck](https://github.com/SGrondin/bottleneck#docs)
-- Try to limit rate and amount of concurrent requests `npx xlf-auto-translate --in messages.xlf --out messages.hi.xlf --from en --to hi --rate 10000 --concurrent 1`
+- Try to set bigger rate `npx xlf-translate-auto --in messages.xlf --out messages.hi.xlf --from en --to hi --rate 5000`, where rate is ms between queries. For more information on that property see [https://github.com/SGrondin/bottleneck](https://github.com/SGrondin/bottleneck#docs)
+- Try to limit rate and amount of concurrent requests `npx xlf-translate-auto --in messages.xlf --out messages.hi.xlf --from en --to hi --rate 10000 --concurrent 1`
 
 ## Developing
 
