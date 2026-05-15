@@ -110,6 +110,8 @@ The easiest way to develop on this module is to use test-driven development.
 
 Unit tests can be run with `npm test`.  To automatically re-run the tests when you make changes to the files, run `npm run test:watch`.
 
+For instructions on how to publish a new version to npm, see [PUBLISHING.md](./PUBLISHING.md).
+
 ## Translation
 
 This utility uses Google Translate's online API for its translations using this NPM package: https://www.npmjs.com/package/@k3rn31p4nic/google-translate-api
