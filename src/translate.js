@@ -85,7 +85,12 @@ async function translate(
         spaces: 2,
         // https://github.com/nashwaan/xml-js/issues/26#issuecomment-355620249
         attributeValueFn: function (value) {
-            return value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return value
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&apos;');
         },
     });
 
